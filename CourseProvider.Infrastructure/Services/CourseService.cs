@@ -65,9 +65,13 @@ public class CourseService(IDbContextFactory<DataContext> contextFactory) : ICou
         var existingCourse = await context.Courses.FirstOrDefaultAsync(c => c.Id == request.Id);
         if (existingCourse == null) return null!;
 
-        var updatedCourseEntity = CourseFactory.Create(request);
-        updatedCourseEntity.Id = existingCourse.Id;
-        context.Entry(existingCourse).CurrentValues.SetValues(updatedCourseEntity);
+        var updated = CourseFactory.Create(request);
+
+        context.Entry(existingCourse).CurrentValues.SetValues(updated);
+
+        existingCourse.Authors = updated.Authors;
+        existingCourse.Prices = updated.Prices;
+        existingCourse.Content = updated.Content;
 
         await context.SaveChangesAsync();
         return CourseFactory.Create(existingCourse);
